@@ -1,0 +1,5 @@
+package: ping1
+output: api_gen/public/ping1/ping1.gen.go
+generate:
+  models: true
+  echo-server: true
