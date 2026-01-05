@@ -3,3 +3,6 @@ output: api_gen/public/ping1/ping1.gen.go
 generate:
   models: true
   echo-server: true
+output-options:
+  include-tags: 
+    - ping1

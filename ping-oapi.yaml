@@ -3,15 +3,13 @@ info:
   version: 1.0.0
   title: Minimal ping API server
 tags:
-  - name: admin
-    description: Admin API endpoints
-  - name: user
-    description: API endpoint that pertains to user data
+  - name: ping1
+  - name: ping
 paths:
   /ping:
     get:
       tags:
-        - user
+        - ping
       operationId: getping
       responses:
         '200':
@@ -21,6 +19,19 @@ paths:
               schema:
                 $ref: '#/components/schemas/Pong'
 
+  /ping1:
+    get:
+      tags:
+        - ping1
+      operationId: ping1
+      responses:
+        '200':
+          description: pet response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Pong'
+                
 components:
   schemas:
     # base types

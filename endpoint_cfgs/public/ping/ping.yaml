@@ -3,3 +3,6 @@ output: api_gen/public/ping/ping.gen.go
 generate:
   models: true
   echo-server: true
+output-options:
+  include-tags:
+    - ping
