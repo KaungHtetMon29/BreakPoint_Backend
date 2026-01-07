@@ -29,7 +29,6 @@ jobs:
       with:
         path: |
           ~/.cache/go-build
-          ~/go/pkg/mod
         key: ${{ runner.os }}-golang-${{ hashFiles('**/go.sum') }}
 
     - name: Build
