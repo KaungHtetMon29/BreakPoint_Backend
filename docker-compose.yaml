@@ -1,0 +1,15 @@
+name: dev
+services:
+  postgres:
+    image: postgres:15.15
+    ports:
+      - 5432:5432
+    environment:
+      - POSTGRES_USER=test
+      - POSTGRES_PASSWORD=testkhm
+      - POSTGRES_DB=testdb
+    volumes:
+      - breakpoint-data:/var/lib/postgresql/data
+
+volumes:
+  breakpoint-data:
