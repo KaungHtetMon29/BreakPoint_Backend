@@ -17,13 +17,16 @@ func main() {
 	e := echo.New()
 	dsn := "host=localhost user=test password=testkhm dbname=testdb port=5432 sslmode=disable TimeZone=Asia/Shanghai"
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
-	psql, err := db.DB()
-	psql.SetMaxIdleConns(10)
-	psql.SetMaxOpenConns(100)
-	psql.SetConnMaxLifetime(30 * time.Minute)
 	if err != nil {
 		panic("failed to connect database")
 	}
+	psql, err := db.DB()
+	if err != nil {
+		panic("cannot get database object")
+	}
+	psql.SetMaxIdleConns(10)
+	psql.SetMaxOpenConns(100)
+	psql.SetConnMaxLifetime(30 * time.Minute)
 	p1Ctrler := p1controller.NewPing1Ctrler()
 	pCtrler := pcontroller.NewPingCtrler()
 	// admin := e.Group("/admin")
