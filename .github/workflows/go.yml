@@ -40,3 +40,15 @@ jobs:
 
     - name: Test
       run: go test -v ./...
+
+  parent:
+    runs-on: ubuntu-latest
+    steps:
+      - name: something
+        run: echo "something"
+  smth:
+    runs-on: ubuntu-latest
+    needs: parent
+    steps:
+      - name: smth
+        run: echo "smth"
