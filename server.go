@@ -21,7 +21,7 @@ func main() {
 	if err != nil {
 		panic("failed to connect database")
 	}
-	db.AutoMigrate(
+	err = db.AutoMigrate(
 		&schema.Admin{},
 		&schema.User{},
 		&schema.BreakPointGenerateHistory{},
@@ -29,6 +29,9 @@ func main() {
 		&schema.UserPlanHistory{},
 		&schema.BreakPointTechniques{},
 	)
+	if err != nil {
+		panic("automigration failed")
+	}
 	psql, err := db.DB()
 	if err != nil {
 		panic("cannot get database object")
