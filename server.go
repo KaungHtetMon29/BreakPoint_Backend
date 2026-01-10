@@ -7,6 +7,7 @@ import (
 	"github.com/KaungHtetMon29/BreakPoint_Backend/api_gen/public/ping1"
 	p1controller "github.com/KaungHtetMon29/BreakPoint_Backend/controller/ping1Controller"
 	pcontroller "github.com/KaungHtetMon29/BreakPoint_Backend/controller/pingController"
+	"github.com/KaungHtetMon29/BreakPoint_Backend/db/schema"
 	"github.com/labstack/echo/v4"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -20,6 +21,14 @@ func main() {
 	if err != nil {
 		panic("failed to connect database")
 	}
+	db.AutoMigrate(
+		&schema.Admin{},
+		&schema.User{},
+		&schema.BreakPointGenerateHistory{},
+		&schema.UserPreferences{},
+		&schema.UserPlanHistory{},
+		&schema.BreakPointTechniques{},
+	)
 	psql, err := db.DB()
 	if err != nil {
 		panic("cannot get database object")
