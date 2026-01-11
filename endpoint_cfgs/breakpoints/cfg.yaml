@@ -1,0 +1,8 @@
+package: breakpoints
+output: api_gen/breakpoints/breakpoints.gen.go
+generate:
+  models: true
+  echo-server: true
+output-options:
+  include-tags: 
+    - breakpoints

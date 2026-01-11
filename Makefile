@@ -1,6 +1,12 @@
 GO := /usr/local/go/bin/go
-ENDPOINT_CFGS:= endpoint_cfgs/public/ping1/ping1.yaml endpoint_cfgs/public/ping/ping.yaml
-OAPI_CFG:= ping-oapi.yaml
+ENDPOINT_CFGS:= endpoint_cfgs/public/ping1/ping1.yaml \
+				endpoint_cfgs/public/ping/ping.yaml \
+				endpoint_cfgs/user/cfg.yaml \
+				endpoint_cfgs/auth/cfg.yaml \
+				endpoint_cfgs/breakpoints/cfg.yaml \
+				endpoint_cfgs/plans/cfg.yaml \
+
+	OAPI_CFG:= oapi.yaml
 
 generate_sequential:=$(foreach cfg,$(ENDPOINT_CFGS), \
 	$(GO) tool oapi-codegen -config $(cfg) $(OAPI_CFG); \

@@ -1,0 +1,315 @@
+openapi: "3.0.0"
+info:
+  version: 1.0.0
+  title: Minimal ping API server
+tags:
+  - name: ping1
+  - name: ping
+  - name: auth
+  - name: user
+  - name: plans
+  - name: admin
+  - name: breakpoints
+paths:
+  /ping:
+    get:
+      tags:
+        - ping
+      operationId: getping
+      responses:
+        '200':
+          description: pet response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Pong'
+
+  /ping1:
+    get:
+      tags:
+        - ping1
+      operationId: ping1
+      responses:
+        '200':
+          description: pet response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Pong'
+  
+  /signup:
+    post:
+      tags:
+        - auth
+      operationId: signUp
+      responses:
+        '200':
+          description: detail signup response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+  
+  /login:
+    post:
+      tags:
+        - auth
+      operationId: login
+      responses:
+        '200':
+          description: detail signup response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+  
+  /logout:
+    post:
+        tags:
+          - auth
+        operationId: logout
+        responses:
+          '200':
+            description: detail signup response
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    status:
+                      type: string
+  
+  /{adminId}:
+    get:
+      tags:
+          - auth
+      operationId: getProfile
+      parameters:
+        - $ref: "#/components/parameters/adminId"
+      responses:
+          '200':
+            description: detail signup response
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    status:
+                      type: string
+
+  /{id}:
+    get:
+      tags:
+        - user
+      operationId: getUserDetail
+      parameters:
+        - $ref: "#/components/parameters/id"
+      responses:
+        '200':
+          description: detail user response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  name:
+                    type: string
+    put:
+      tags:
+        - user
+      operationId: updateUserDetail
+      parameters:
+        - $ref: "#/components/parameters/id"
+      responses:
+        '200':
+          description: detail user response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+
+  /{id}/preferences:
+    get:
+      tags:
+        - user
+      operationId: getUserPreferences
+      parameters:
+        - $ref: "#/components/parameters/id"
+      responses:
+        '200':
+          description: detail user response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+
+    put:
+      tags:
+        - user
+      operationId: updateUserPreferences
+      parameters:
+        - $ref: "#/components/parameters/id"
+      responses:
+        '200':
+          description: detail user response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+
+
+  /techniques:
+    get:
+      tags:
+        - breakpoints
+      operationId: getBreakPointTechniques
+      responses:
+        '200':
+          description: detail user response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+  
+  /generate:
+    post:
+      tags:
+        - breakpoints
+      operationId: generateBreakPoint
+      responses:
+        '200':
+          description: detail user response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+  
+  /history:
+    get:
+      tags:
+        - breakpoints
+      operationId: getBreakPointHistory
+      responses:
+        '200':
+          description: detail user response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+
+  /current:
+    get:
+      tags:
+        - plans
+      operationId: getCurrentPlan
+      responses:
+        '200':
+          description: detail user response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+  
+  /upgrade:
+    post:
+      tags:
+        - plans
+      operationId: postUpgradePlan
+      responses:
+        '200':
+          description: detail user response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+  
+  /plan_history:
+    get:
+      tags:
+        - plans
+      operationId: getPlanHistory
+      responses:
+        '200':
+          description: detail user response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+  
+  /usage:
+    get:
+      tags:
+        - plans
+      operationId: getPlanUsage
+      responses:
+        '200':
+          description: detail user response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+
+
+                
+components:
+  parameters:
+    id:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: string
+
+    adminId:
+      name: adminId
+      in: path
+      required: true
+      schema:
+        type: string
+
+  schemas:
+    # base types
+    Pong:
+      type: object
+      required:
+        - ping
+      properties:
+        ping:
+          type: string
+          example: pong

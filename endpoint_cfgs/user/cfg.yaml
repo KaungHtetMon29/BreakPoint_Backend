@@ -1,0 +1,8 @@
+package: user
+output: api_gen/user/user.gen.go
+generate:
+  models: true
+  echo-server: true
+output-options:
+  include-tags: 
+    - user
