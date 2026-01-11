@@ -116,8 +116,13 @@ paths:
               schema:
                 type: object
                 properties:
-                  name:
+                  uuid:
                     type: string
+                  username:
+                    type: string
+                  email:
+                    type: string
+                  
     put:
       tags:
         - user

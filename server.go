@@ -1,6 +1,8 @@
 package main
 
 import (
+	"encoding/json"
+	"fmt"
 	"time"
 
 	"github.com/KaungHtetMon29/BreakPoint_Backend/api_gen/admin"
@@ -46,10 +48,16 @@ func main() {
 	if err != nil {
 		panic("cannot get database object")
 	}
+	var users []schema.User
+	tx := db.Where("name = ?", "khm").Find(&users)
+	if tx.Error != nil {
+		fmt.Println(tx.Error.Error())
+	}
+	userJSON, _ := json.Marshal(users)
+	fmt.Println(string(userJSON))
 	psql.SetMaxIdleConns(10)
 	psql.SetMaxOpenConns(100)
 	psql.SetConnMaxLifetime(30 * time.Minute)
-
 	adminGroup := e.Group("/admin")
 	userGroup := e.Group("/user")
 	authGroup := e.Group("/auth")
