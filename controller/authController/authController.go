@@ -3,7 +3,6 @@ package authController
 import (
 	"net/http"
 
-	"github.com/KaungHtetMon29/BreakPoint_Backend/api_gen/auth"
 	"github.com/labstack/echo/v4"
 )
 
@@ -26,6 +25,6 @@ func (pc *User) SignUp(ctx echo.Context) error {
 	return ctx.JSON(http.StatusOK, "signup")
 }
 
-func (pc *User) GetProfile(ctx echo.Context, adminId auth.AdminId) error {
+func (pc *User) GetProfile(ctx echo.Context) error {
 	return ctx.JSON(http.StatusOK, "get profile")
 }

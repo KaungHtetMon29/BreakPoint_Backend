@@ -85,13 +85,11 @@ paths:
                     status:
                       type: string
   
-  /{adminId}:
+  /me:
     get:
       tags:
           - auth
       operationId: getProfile
-      parameters:
-        - $ref: "#/components/parameters/adminId"
       responses:
           '200':
             description: detail signup response
@@ -285,8 +283,158 @@ paths:
                   status:
                     type: string
 
+  /users:
+    get:
+      tags:
+        - admin
+      operationId: getUsers
+      responses:
+        '200':
+          description: detail user response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+  
+  /users/{id}:
+    get:
+      tags:
+        - admin
+      operationId: getUserDetails
+      parameters:
+        - $ref: "#/components/parameters/id"
+      responses:
+        '200':
+          description: detail user response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
 
-                
+  /users/{id}/status:
+    patch:
+      tags:
+        - admin
+      operationId: getUserStatus
+      parameters:
+        - $ref: "#/components/parameters/id"
+      responses:
+        '200':
+          description: detail user response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+
+  /add_admin:
+    post:
+      tags:
+        - admin
+      operationId: insertAdmin
+      responses:
+        '200':
+          description: detail user response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+  
+  /{adminId}:
+    get:
+      tags:
+        - admin
+      operationId: getAdminDetail
+      parameters:
+        - $ref: "#/components/parameters/adminId"
+      responses:
+        '200':
+          description: detail user response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+
+    put:
+      tags:
+        - admin
+      operationId: updateAdminDetail
+      parameters:
+        - $ref: "#/components/parameters/adminId"
+      responses:
+        '200':
+          description: detail user response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+
+    delete:
+      tags:
+        - admin
+      operationId: deleteAdmin
+      parameters:
+        - $ref: "#/components/parameters/adminId"
+      responses:
+        '200':
+          description: detail user response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+  
+  /auth/login:
+    post:
+      tags:
+        - admin
+      operationId: adminLogin
+      responses:
+        '200':
+          description: detail user response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+
+  /auth/logout:
+    post:
+      tags:
+        - admin
+      operationId: adminLogout
+      responses:
+        '200':
+          description: detail user response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+      
 components:
   parameters:
     id:

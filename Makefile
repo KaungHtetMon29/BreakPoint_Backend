@@ -5,6 +5,7 @@ ENDPOINT_CFGS:= endpoint_cfgs/public/ping1/ping1.yaml \
 				endpoint_cfgs/auth/cfg.yaml \
 				endpoint_cfgs/breakpoints/cfg.yaml \
 				endpoint_cfgs/plans/cfg.yaml \
+				endpoint_cfgs/admin/cfg.yaml \
 
 	OAPI_CFG:= oapi.yaml
 

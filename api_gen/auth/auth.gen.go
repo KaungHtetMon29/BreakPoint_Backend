@@ -4,15 +4,8 @@
 package auth
 
 import (
-	"fmt"
-	"net/http"
-
 	"github.com/labstack/echo/v4"
-	"github.com/oapi-codegen/runtime"
 )
-
-// AdminId defines model for adminId.
-type AdminId = string
 
 // ServerInterface represents all server handlers.
 type ServerInterface interface {
@@ -23,11 +16,11 @@ type ServerInterface interface {
 	// (POST /logout)
 	Logout(ctx echo.Context) error
 
+	// (GET /me)
+	GetProfile(ctx echo.Context) error
+
 	// (POST /signup)
 	SignUp(ctx echo.Context) error
-
-	// (GET /{adminId})
-	GetProfile(ctx echo.Context, adminId AdminId) error
 }
 
 // ServerInterfaceWrapper converts echo contexts to parameters.
@@ -53,28 +46,21 @@ func (w *ServerInterfaceWrapper) Logout(ctx echo.Context) error {
 	return err
 }
 
+// GetProfile converts echo context to params.
+func (w *ServerInterfaceWrapper) GetProfile(ctx echo.Context) error {
+	var err error
+
+	// Invoke the callback with all the unmarshaled arguments
+	err = w.Handler.GetProfile(ctx)
+	return err
+}
+
 // SignUp converts echo context to params.
 func (w *ServerInterfaceWrapper) SignUp(ctx echo.Context) error {
 	var err error
 
 	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.SignUp(ctx)
-	return err
-}
-
-// GetProfile converts echo context to params.
-func (w *ServerInterfaceWrapper) GetProfile(ctx echo.Context) error {
-	var err error
-	// ------------- Path parameter "adminId" -------------
-	var adminId AdminId
-
-	err = runtime.BindStyledParameterWithOptions("simple", "adminId", ctx.Param("adminId"), &adminId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
-	if err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter adminId: %s", err))
-	}
-
-	// Invoke the callback with all the unmarshaled arguments
-	err = w.Handler.GetProfile(ctx, adminId)
 	return err
 }
 
@@ -108,7 +94,7 @@ func RegisterHandlersWithBaseURL(router EchoRouter, si ServerInterface, baseURL 
 
 	router.POST(baseURL+"/login", wrapper.Login)
 	router.POST(baseURL+"/logout", wrapper.Logout)
+	router.GET(baseURL+"/me", wrapper.GetProfile)
 	router.POST(baseURL+"/signup", wrapper.SignUp)
-	router.GET(baseURL+"/:adminId", wrapper.GetProfile)
 
 }

@@ -3,12 +3,14 @@ package main
 import (
 	"time"
 
+	"github.com/KaungHtetMon29/BreakPoint_Backend/api_gen/admin"
 	"github.com/KaungHtetMon29/BreakPoint_Backend/api_gen/auth"
 	"github.com/KaungHtetMon29/BreakPoint_Backend/api_gen/breakpoints"
 	"github.com/KaungHtetMon29/BreakPoint_Backend/api_gen/plans"
 	"github.com/KaungHtetMon29/BreakPoint_Backend/api_gen/public/ping"
 	"github.com/KaungHtetMon29/BreakPoint_Backend/api_gen/public/ping1"
 	"github.com/KaungHtetMon29/BreakPoint_Backend/api_gen/user"
+	"github.com/KaungHtetMon29/BreakPoint_Backend/controller/adminController"
 	"github.com/KaungHtetMon29/BreakPoint_Backend/controller/authController"
 	"github.com/KaungHtetMon29/BreakPoint_Backend/controller/breakpointsController"
 	p1controller "github.com/KaungHtetMon29/BreakPoint_Backend/controller/ping1Controller"
@@ -48,17 +50,21 @@ func main() {
 	psql.SetMaxOpenConns(100)
 	psql.SetConnMaxLifetime(30 * time.Minute)
 
-	// admin := e.Group("/admin")
+	adminGroup := e.Group("/admin")
 	userGroup := e.Group("/user")
 	authGroup := e.Group("/auth")
 	breakPointGroup := e.Group("/breakpoints")
 	planGroup := e.Group("/plans")
+
 	p1Ctrler := p1controller.NewPing1Ctrler()
 	pCtrler := pcontroller.NewPingCtrler()
 	userCtrl := userController.NewUserCtrler()
 	authCtrl := authController.NewAuthCtrler()
 	bpCtrl := breakpointsController.NewBreakpointsCtrler()
 	planCtrl := plansController.NewPlansCtrler()
+	adminCtrl := adminController.NewAdminCtrler()
+
+	admin.RegisterHandlers(adminGroup, adminCtrl)
 	ping1.RegisterHandlers(userGroup, p1Ctrler)
 	ping.RegisterHandlers(userGroup, pCtrler)
 	user.RegisterHandlers(userGroup, userCtrl)

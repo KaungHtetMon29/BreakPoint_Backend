@@ -1,0 +1,8 @@
+package: admin
+output: api_gen/admin/admin.gen.go
+generate:
+  models: true
+  echo-server: true
+output-options:
+  include-tags:
+    - admin
