@@ -1,8 +1,6 @@
 package main
 
 import (
-	"encoding/json"
-	"fmt"
 	"time"
 
 	"github.com/KaungHtetMon29/BreakPoint_Backend/api_gen/admin"
@@ -20,6 +18,10 @@ import (
 	"github.com/KaungHtetMon29/BreakPoint_Backend/controller/plansController"
 	"github.com/KaungHtetMon29/BreakPoint_Backend/controller/userController"
 	"github.com/KaungHtetMon29/BreakPoint_Backend/db/schema"
+	"github.com/KaungHtetMon29/BreakPoint_Backend/repository/breakpointRepository"
+	"github.com/KaungHtetMon29/BreakPoint_Backend/repository/userRepository"
+	"github.com/KaungHtetMon29/BreakPoint_Backend/usecase/breakpointUsecase"
+	"github.com/KaungHtetMon29/BreakPoint_Backend/usecase/userUsecase"
 	"github.com/labstack/echo/v4"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -48,13 +50,6 @@ func main() {
 	if err != nil {
 		panic("cannot get database object")
 	}
-	var users []schema.User
-	tx := db.Where("name = ?", "khm").Find(&users)
-	if tx.Error != nil {
-		fmt.Println(tx.Error.Error())
-	}
-	userJSON, _ := json.Marshal(users)
-	fmt.Println(string(userJSON))
 	psql.SetMaxIdleConns(10)
 	psql.SetMaxOpenConns(100)
 	psql.SetConnMaxLifetime(30 * time.Minute)
@@ -64,9 +59,15 @@ func main() {
 	breakPointGroup := e.Group("/breakpoints")
 	planGroup := e.Group("/plans")
 
+	userRepo := userRepository.NewUserRepository(db)
+	breakpointRepo := breakpointRepository.NewBreakpointRepository(db)
+
+	userUsecase := userUsecase.NewUserUsecase(userRepo)
+	breakpointUsecase := breakpointUsecase.NewBreakpointUsecase(breakpointRepo)
+
 	p1Ctrler := p1controller.NewPing1Ctrler()
 	pCtrler := pcontroller.NewPingCtrler()
-	userCtrl := userController.NewUserCtrler()
+	userCtrl := userController.NewUserCtrler(userUsecase)
 	authCtrl := authController.NewAuthCtrler()
 	bpCtrl := breakpointsController.NewBreakpointsCtrler()
 	planCtrl := plansController.NewPlansCtrler()
@@ -79,5 +80,6 @@ func main() {
 	auth.RegisterHandlers(authGroup, authCtrl)
 	plans.RegisterHandlers(planGroup, planCtrl)
 	breakpoints.RegisterHandlers(breakPointGroup, bpCtrl)
+
 	e.Logger.Fatal(e.Start(":1323"))
 }

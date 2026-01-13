@@ -16,7 +16,7 @@ const (
 type UserPlanHistory struct {
 	Id         int64     `gorm:"primaryKey;"`
 	UUID       uuid.UUID `gorm:"type:uuid;default:gen_random_uuid();unique"`
-	UserID     int64     `gorm:"not null;unique"`
+	UserUUID   int64     `gorm:"not null;unique"`
 	PlanType   Plan      `gorm:"not null"`
 	Start_Date time.Time
 	End_Date   time.Time

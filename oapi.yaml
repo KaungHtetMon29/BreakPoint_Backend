@@ -155,7 +155,7 @@ paths:
               schema:
                 type: object
                 properties:
-                  status:
+                  preference:
                     type: string
 
     put:
