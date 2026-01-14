@@ -69,7 +69,7 @@ func main() {
 	pCtrler := pcontroller.NewPingCtrler()
 	userCtrl := userController.NewUserCtrler(userUsecase)
 	authCtrl := authController.NewAuthCtrler()
-	bpCtrl := breakpointsController.NewBreakpointsCtrler()
+	bpCtrl := breakpointsController.NewBreakpointsCtrler(breakpointUsecase)
 	planCtrl := plansController.NewPlansCtrler()
 	adminCtrl := adminController.NewAdminCtrler()
 

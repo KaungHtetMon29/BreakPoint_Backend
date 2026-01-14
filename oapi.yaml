@@ -176,22 +176,30 @@ paths:
                     type: string
 
 
-  /techniques:
+  /{id}/techniques:
     get:
       tags:
         - breakpoints
       operationId: getBreakPointTechniques
+      parameters:
+        - $ref: "#/components/parameters/id"
       responses:
         '200':
           description: detail user response
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  status:
-                    type: string
-  
+                type: array
+                items:
+                  type: object
+                  properties:
+                    uuid:
+                      type: string
+                    is_active:
+                      type: boolean
+                    techniques:
+                      type: string
+
   /generate:
     post:
       tags:
@@ -208,22 +216,27 @@ paths:
                   status:
                     type: string
   
-  /history:
+  /{id}/history:
     get:
       tags:
         - breakpoints
       operationId: getBreakPointHistory
+      parameters:
+        - $ref: "#/components/parameters/id"
       responses:
         '200':
           description: detail user response
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  status:
-                    type: string
-
+                type: array
+                items:
+                  type: object
+                  properties:
+                    uuid:
+                      type: string
+                    created_at:
+                      type: string
   /current:
     get:
       tags:

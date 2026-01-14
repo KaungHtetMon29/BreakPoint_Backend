@@ -4,8 +4,15 @@
 package breakpoints
 
 import (
+	"fmt"
+	"net/http"
+
 	"github.com/labstack/echo/v4"
+	"github.com/oapi-codegen/runtime"
 )
+
+// Id defines model for id.
+type Id = string
 
 // ServerInterface represents all server handlers.
 type ServerInterface interface {
@@ -13,11 +20,11 @@ type ServerInterface interface {
 	// (POST /generate)
 	GenerateBreakPoint(ctx echo.Context) error
 
-	// (GET /history)
-	GetBreakPointHistory(ctx echo.Context) error
+	// (GET /{id}/history)
+	GetBreakPointHistory(ctx echo.Context, id Id) error
 
-	// (GET /techniques)
-	GetBreakPointTechniques(ctx echo.Context) error
+	// (GET /{id}/techniques)
+	GetBreakPointTechniques(ctx echo.Context, id Id) error
 }
 
 // ServerInterfaceWrapper converts echo contexts to parameters.
@@ -37,18 +44,32 @@ func (w *ServerInterfaceWrapper) GenerateBreakPoint(ctx echo.Context) error {
 // GetBreakPointHistory converts echo context to params.
 func (w *ServerInterfaceWrapper) GetBreakPointHistory(ctx echo.Context) error {
 	var err error
+	// ------------- Path parameter "id" -------------
+	var id Id
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", ctx.Param("id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter id: %s", err))
+	}
 
 	// Invoke the callback with all the unmarshaled arguments
-	err = w.Handler.GetBreakPointHistory(ctx)
+	err = w.Handler.GetBreakPointHistory(ctx, id)
 	return err
 }
 
 // GetBreakPointTechniques converts echo context to params.
 func (w *ServerInterfaceWrapper) GetBreakPointTechniques(ctx echo.Context) error {
 	var err error
+	// ------------- Path parameter "id" -------------
+	var id Id
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", ctx.Param("id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter id: %s", err))
+	}
 
 	// Invoke the callback with all the unmarshaled arguments
-	err = w.Handler.GetBreakPointTechniques(ctx)
+	err = w.Handler.GetBreakPointTechniques(ctx, id)
 	return err
 }
 
@@ -81,7 +102,7 @@ func RegisterHandlersWithBaseURL(router EchoRouter, si ServerInterface, baseURL 
 	}
 
 	router.POST(baseURL+"/generate", wrapper.GenerateBreakPoint)
-	router.GET(baseURL+"/history", wrapper.GetBreakPointHistory)
-	router.GET(baseURL+"/techniques", wrapper.GetBreakPointTechniques)
+	router.GET(baseURL+"/:id/history", wrapper.GetBreakPointHistory)
+	router.GET(baseURL+"/:id/techniques", wrapper.GetBreakPointTechniques)
 
 }

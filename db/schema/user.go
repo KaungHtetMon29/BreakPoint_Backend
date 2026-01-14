@@ -17,6 +17,7 @@ type User struct {
 	Updated_at                time.Time
 	Deleted_at                time.Time
 	BreakPointGenerateHistory []BreakPointGenerateHistory `gorm:"foreignKey:UserUUID;references:UUID"`
+	BreakPointTechniques      []BreakPointTechniques      `gorm:"foreignKey:UserUUID;references:UUID"`
 	UserPreferences           []UserPreferences           `gorm:"foreignKey:UserUUID;references:UUID"`
 	UserPlanHistory           []UserPlanHistory           `gorm:"foreignKey:UserUUID;references:UUID"`
 }
