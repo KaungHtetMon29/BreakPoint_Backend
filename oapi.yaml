@@ -237,11 +237,13 @@ paths:
                       type: string
                     created_at:
                       type: string
-  /current:
+  /{id}/current:
     get:
       tags:
         - plans
       operationId: getCurrentPlan
+      parameters:
+        - $ref: "#/components/parameters/id"
       responses:
         '200':
           description: detail user response
@@ -250,7 +252,13 @@ paths:
               schema:
                 type: object
                 properties:
-                  status:
+                  uuid:
+                    type: string
+                  plan_type:
+                    type: string
+                  start_date:
+                    type: string
+                  end_date:
                     type: string
   
   /upgrade:
@@ -269,21 +277,31 @@ paths:
                   status:
                     type: string
   
-  /plan_history:
+  /{id}/plan_history:
     get:
       tags:
         - plans
       operationId: getPlanHistory
+      parameters:
+        - $ref: "#/components/parameters/id"
       responses:
         '200':
           description: detail user response
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  status:
-                    type: string
+                type: array
+                items:
+                  type: object
+                  properties:
+                    uuid:
+                      type: string
+                    plan_type:
+                      type: string
+                    start_date:
+                      type: string
+                    end_date:
+                      type: string
   
   /usage:
     get:

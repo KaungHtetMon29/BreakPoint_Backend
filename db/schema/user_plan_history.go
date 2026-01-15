@@ -13,13 +13,14 @@ const (
 	Premium Plan = "premium"
 )
 
-type UserPlanHistory struct {
+type UserPlans struct {
 	Id         int64     `gorm:"primaryKey;"`
 	UUID       uuid.UUID `gorm:"type:uuid;default:gen_random_uuid();unique"`
-	UserUUID   int64     `gorm:"not null;unique"`
+	UserUUID   uuid.UUID `gorm:"not null;"`
 	PlanType   Plan      `gorm:"not null"`
-	Start_Date time.Time
-	End_Date   time.Time
+	IsActive   bool      `gorm:"not null; default:false"`
+	Start_Date *time.Time
+	End_Date   *time.Time
 	Created_at time.Time `gorm:"not null"`
-	Deleted_at time.Time
+	Deleted_at *time.Time
 }

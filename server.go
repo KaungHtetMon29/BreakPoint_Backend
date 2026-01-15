@@ -19,8 +19,10 @@ import (
 	"github.com/KaungHtetMon29/BreakPoint_Backend/controller/userController"
 	"github.com/KaungHtetMon29/BreakPoint_Backend/db/schema"
 	"github.com/KaungHtetMon29/BreakPoint_Backend/repository/breakpointRepository"
+	"github.com/KaungHtetMon29/BreakPoint_Backend/repository/plansRepository"
 	"github.com/KaungHtetMon29/BreakPoint_Backend/repository/userRepository"
 	"github.com/KaungHtetMon29/BreakPoint_Backend/usecase/breakpointUsecase"
+	plansUsecase "github.com/KaungHtetMon29/BreakPoint_Backend/usecase/plans"
 	"github.com/KaungHtetMon29/BreakPoint_Backend/usecase/userUsecase"
 	"github.com/labstack/echo/v4"
 	"gorm.io/driver/postgres"
@@ -40,8 +42,9 @@ func main() {
 		&schema.User{},
 		&schema.BreakPointGenerateHistory{},
 		&schema.UserPreferences{},
-		&schema.UserPlanHistory{},
+		&schema.UserPlans{},
 		&schema.BreakPointTechniques{},
+		&schema.PlanUsage{},
 	)
 	if err != nil {
 		panic("automigration failed")
@@ -61,16 +64,18 @@ func main() {
 
 	userRepo := userRepository.NewUserRepository(db)
 	breakpointRepo := breakpointRepository.NewBreakpointRepository(db)
+	plansRepo := plansRepository.NewPlansRepository(db)
 
 	userUsecase := userUsecase.NewUserUsecase(userRepo)
 	breakpointUsecase := breakpointUsecase.NewBreakpointUsecase(breakpointRepo)
+	plansUsecase := plansUsecase.NewPlansUsecase(plansRepo)
 
 	p1Ctrler := p1controller.NewPing1Ctrler()
 	pCtrler := pcontroller.NewPingCtrler()
 	userCtrl := userController.NewUserCtrler(userUsecase)
 	authCtrl := authController.NewAuthCtrler()
 	bpCtrl := breakpointsController.NewBreakpointsCtrler(breakpointUsecase)
-	planCtrl := plansController.NewPlansCtrler()
+	planCtrl := plansController.NewPlansCtrler(plansUsecase)
 	adminCtrl := adminController.NewAdminCtrler()
 
 	admin.RegisterHandlers(adminGroup, adminCtrl)

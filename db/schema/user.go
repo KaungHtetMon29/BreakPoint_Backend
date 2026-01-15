@@ -19,5 +19,5 @@ type User struct {
 	BreakPointGenerateHistory []BreakPointGenerateHistory `gorm:"foreignKey:UserUUID;references:UUID"`
 	BreakPointTechniques      []BreakPointTechniques      `gorm:"foreignKey:UserUUID;references:UUID"`
 	UserPreferences           []UserPreferences           `gorm:"foreignKey:UserUUID;references:UUID"`
-	UserPlanHistory           []UserPlanHistory           `gorm:"foreignKey:UserUUID;references:UUID"`
+	UserPlanHistory           []UserPlans                 `gorm:"foreignKey:UserUUID;references:UUID"`
 }

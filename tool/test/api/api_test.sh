@@ -14,9 +14,13 @@ curl -X DELETE localhost:1323/admin/{adminId}
 curl -X GET localhost:1323/admin/{adminId}
 curl -X PUT localhost:1323/admin/{adminId}
 echo "------------------------"
-curl localhost:1323/user/3b911a22-9e99-4d05-afec-c3f25bc66f15
-curl localhost:1323/user/3b911a22-9e99-4d05-afec-c3f25bc66f15/preferences
+curl localhost:1323/user/1a8cc69e-c7d0-4f27-8e2e-a6023c27cdac
+curl localhost:1323/user/1a8cc69e-c7d0-4f27-8e2e-a6023c27cdac/preferences
 
 echo "------------------------"
-curl localhost:1323/breakpoints/3b911a22-9e99-4d05-afec-c3f25bc66f15/techniques
-curl localhost:1323/breakpoints/3b911a22-9e99-4d05-afec-c3f25bc66f15/history
+curl localhost:1323/breakpoints/1a8cc69e-c7d0-4f27-8e2e-a6023c27cdac/techniques
+curl localhost:1323/breakpoints/1a8cc69e-c7d0-4f27-8e2e-a6023c27cdac/history
+
+echo "------------------------"
+curl localhost:1323/plans/1a8cc69e-c7d0-4f27-8e2e-a6023c27cdac/current
+curl localhost:1323/plans/1a8cc69e-c7d0-4f27-8e2e-a6023c27cdac/plan_history

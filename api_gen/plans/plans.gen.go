@@ -4,46 +4,35 @@
 package plans
 
 import (
+	"fmt"
+	"net/http"
+
 	"github.com/labstack/echo/v4"
+	"github.com/oapi-codegen/runtime"
 )
+
+// Id defines model for id.
+type Id = string
 
 // ServerInterface represents all server handlers.
 type ServerInterface interface {
-
-	// (GET /current)
-	GetCurrentPlan(ctx echo.Context) error
-
-	// (GET /plan_history)
-	GetPlanHistory(ctx echo.Context) error
 
 	// (POST /upgrade)
 	PostUpgradePlan(ctx echo.Context) error
 
 	// (GET /usage)
 	GetPlanUsage(ctx echo.Context) error
+
+	// (GET /{id}/current)
+	GetCurrentPlan(ctx echo.Context, id Id) error
+
+	// (GET /{id}/plan_history)
+	GetPlanHistory(ctx echo.Context, id Id) error
 }
 
 // ServerInterfaceWrapper converts echo contexts to parameters.
 type ServerInterfaceWrapper struct {
 	Handler ServerInterface
-}
-
-// GetCurrentPlan converts echo context to params.
-func (w *ServerInterfaceWrapper) GetCurrentPlan(ctx echo.Context) error {
-	var err error
-
-	// Invoke the callback with all the unmarshaled arguments
-	err = w.Handler.GetCurrentPlan(ctx)
-	return err
-}
-
-// GetPlanHistory converts echo context to params.
-func (w *ServerInterfaceWrapper) GetPlanHistory(ctx echo.Context) error {
-	var err error
-
-	// Invoke the callback with all the unmarshaled arguments
-	err = w.Handler.GetPlanHistory(ctx)
-	return err
 }
 
 // PostUpgradePlan converts echo context to params.
@@ -61,6 +50,38 @@ func (w *ServerInterfaceWrapper) GetPlanUsage(ctx echo.Context) error {
 
 	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.GetPlanUsage(ctx)
+	return err
+}
+
+// GetCurrentPlan converts echo context to params.
+func (w *ServerInterfaceWrapper) GetCurrentPlan(ctx echo.Context) error {
+	var err error
+	// ------------- Path parameter "id" -------------
+	var id Id
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", ctx.Param("id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter id: %s", err))
+	}
+
+	// Invoke the callback with all the unmarshaled arguments
+	err = w.Handler.GetCurrentPlan(ctx, id)
+	return err
+}
+
+// GetPlanHistory converts echo context to params.
+func (w *ServerInterfaceWrapper) GetPlanHistory(ctx echo.Context) error {
+	var err error
+	// ------------- Path parameter "id" -------------
+	var id Id
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", ctx.Param("id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter id: %s", err))
+	}
+
+	// Invoke the callback with all the unmarshaled arguments
+	err = w.Handler.GetPlanHistory(ctx, id)
 	return err
 }
 
@@ -92,9 +113,9 @@ func RegisterHandlersWithBaseURL(router EchoRouter, si ServerInterface, baseURL 
 		Handler: si,
 	}
 
-	router.GET(baseURL+"/current", wrapper.GetCurrentPlan)
-	router.GET(baseURL+"/plan_history", wrapper.GetPlanHistory)
 	router.POST(baseURL+"/upgrade", wrapper.PostUpgradePlan)
 	router.GET(baseURL+"/usage", wrapper.GetPlanUsage)
+	router.GET(baseURL+"/:id/current", wrapper.GetCurrentPlan)
+	router.GET(baseURL+"/:id/plan_history", wrapper.GetPlanHistory)
 
 }
