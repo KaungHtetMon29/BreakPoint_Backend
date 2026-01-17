@@ -22,4 +22,5 @@ type BreakpointUsecase interface {
 type PlansUsecase interface {
 	GetCurrentPlan(ctx echo.Context, id plans.Id) (*schema.UserPlans, error)
 	GetPlanHistory(ctx echo.Context, id plans.Id) ([]schema.UserPlans, error)
+	GetPlanUsage(ctx echo.Context, id plans.Id) ([]schema.PlanUsage, error)
 }

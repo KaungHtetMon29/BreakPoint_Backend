@@ -23,4 +23,5 @@ type UserPlans struct {
 	End_Date   *time.Time
 	Created_at time.Time `gorm:"not null"`
 	Deleted_at *time.Time
+	PlanUsage  []PlanUsage `gorm:"foreignKey:PlanUUID;references:UUID"`
 }

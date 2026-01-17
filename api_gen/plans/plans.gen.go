@@ -20,14 +20,14 @@ type ServerInterface interface {
 	// (POST /upgrade)
 	PostUpgradePlan(ctx echo.Context) error
 
-	// (GET /usage)
-	GetPlanUsage(ctx echo.Context) error
-
 	// (GET /{id}/current)
 	GetCurrentPlan(ctx echo.Context, id Id) error
 
 	// (GET /{id}/plan_history)
 	GetPlanHistory(ctx echo.Context, id Id) error
+
+	// (GET /{id}/usage)
+	GetPlanUsage(ctx echo.Context, id Id) error
 }
 
 // ServerInterfaceWrapper converts echo contexts to parameters.
@@ -41,15 +41,6 @@ func (w *ServerInterfaceWrapper) PostUpgradePlan(ctx echo.Context) error {
 
 	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.PostUpgradePlan(ctx)
-	return err
-}
-
-// GetPlanUsage converts echo context to params.
-func (w *ServerInterfaceWrapper) GetPlanUsage(ctx echo.Context) error {
-	var err error
-
-	// Invoke the callback with all the unmarshaled arguments
-	err = w.Handler.GetPlanUsage(ctx)
 	return err
 }
 
@@ -85,6 +76,22 @@ func (w *ServerInterfaceWrapper) GetPlanHistory(ctx echo.Context) error {
 	return err
 }
 
+// GetPlanUsage converts echo context to params.
+func (w *ServerInterfaceWrapper) GetPlanUsage(ctx echo.Context) error {
+	var err error
+	// ------------- Path parameter "id" -------------
+	var id Id
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", ctx.Param("id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter id: %s", err))
+	}
+
+	// Invoke the callback with all the unmarshaled arguments
+	err = w.Handler.GetPlanUsage(ctx, id)
+	return err
+}
+
 // This is a simple interface which specifies echo.Route addition functions which
 // are present on both echo.Echo and echo.Group, since we want to allow using
 // either of them for path registration
@@ -114,8 +121,8 @@ func RegisterHandlersWithBaseURL(router EchoRouter, si ServerInterface, baseURL 
 	}
 
 	router.POST(baseURL+"/upgrade", wrapper.PostUpgradePlan)
-	router.GET(baseURL+"/usage", wrapper.GetPlanUsage)
 	router.GET(baseURL+"/:id/current", wrapper.GetCurrentPlan)
 	router.GET(baseURL+"/:id/plan_history", wrapper.GetPlanHistory)
+	router.GET(baseURL+"/:id/usage", wrapper.GetPlanUsage)
 
 }

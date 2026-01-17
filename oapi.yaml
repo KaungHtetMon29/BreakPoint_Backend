@@ -303,20 +303,26 @@ paths:
                     end_date:
                       type: string
   
-  /usage:
+  /{id}/usage:
     get:
       tags:
         - plans
       operationId: getPlanUsage
+      parameters:
+        - $ref: "#/components/parameters/id"
       responses:
         '200':
           description: detail user response
           content:
             application/json:
               schema:
-                type: object
+                type: array
+                items:
+                  type: object
                 properties:
-                  status:
+                  generation_count:
+                    type: integer
+                  date:
                     type: string
 
   /users:

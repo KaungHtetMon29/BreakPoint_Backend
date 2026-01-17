@@ -40,8 +40,12 @@ func (pc *Plans) PostUpgradePlan(ctx echo.Context) error {
 	return ctx.JSON(http.StatusOK, "post upgrade plan")
 }
 
-func (pc *Plans) GetPlanUsage(ctx echo.Context) error {
-	return ctx.JSON(http.StatusOK, "get plan usage")
+func (pc *Plans) GetPlanUsage(ctx echo.Context, id plans.Id) error {
+	usage, err := pc.plansUsecase.GetPlanUsage(ctx, id)
+	if err != nil {
+		return err
+	}
+	return ctx.JSON(http.StatusOK, convertToPlanUsageDto(usage))
 }
 
 func convertToCurrentPlanDto(plan *schema.UserPlans) dto.PlanDto {
@@ -76,6 +80,15 @@ func convertToPlanHistoryDto(plans []schema.UserPlans) []dto.PlanDto {
 		dto[i].StartDate = startDate
 		dto[i].EndDate = endDate
 		dto[i].PlanType = string(v.PlanType)
+	}
+	return dto
+}
+
+func convertToPlanUsageDto(usage []schema.PlanUsage) []dto.PlanUsageDto {
+	var dto = make([]dto.PlanUsageDto, len(usage))
+	for i, v := range usage {
+		dto[i].GenCount = v.GenerateCount
+		dto[i].Date = v.Created_at.String()
 	}
 	return dto
 }

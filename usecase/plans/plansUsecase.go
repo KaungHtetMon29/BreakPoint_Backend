@@ -32,3 +32,11 @@ func (pu *PlansUsecase) GetPlanHistory(ctx echo.Context, id plans.Id) ([]schema.
 	}
 	return plans, nil
 }
+
+func (pu *PlansUsecase) GetPlanUsage(ctx echo.Context, id plans.Id) ([]schema.PlanUsage, error) {
+	usage, err := pu.plansRepo.GetPlanUsage(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+	return usage, nil
+}

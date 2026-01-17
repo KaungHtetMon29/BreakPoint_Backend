@@ -33,3 +33,12 @@ func (pr *plansRepository) GetPlanHistory(ctx echo.Context, id plans.Id) ([]sche
 	}
 	return planHistory, nil
 }
+
+func (pr *plansRepository) GetPlanUsage(ctx echo.Context, id plans.Id) ([]schema.PlanUsage, error) {
+	var planUsage []schema.PlanUsage
+	tx := pr.db.Where("plan_uuid = ?", id).Find(&planUsage)
+	if tx.Error != nil {
+		return nil, tx.Error
+	}
+	return planUsage, nil
+}

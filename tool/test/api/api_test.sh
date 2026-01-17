@@ -24,3 +24,6 @@ curl localhost:1323/breakpoints/1a8cc69e-c7d0-4f27-8e2e-a6023c27cdac/history
 echo "------------------------"
 curl localhost:1323/plans/1a8cc69e-c7d0-4f27-8e2e-a6023c27cdac/current
 curl localhost:1323/plans/1a8cc69e-c7d0-4f27-8e2e-a6023c27cdac/plan_history
+
+echo "------------------------"
+curl localhost:1323/plans/259fe845-4b2d-4558-bd95-efbf1bd92d87/usage
