@@ -1,7 +1,10 @@
 openapi: "3.0.0"
 info:
-  version: 1.0.0
-  title: Minimal ping API server
+  version: 0.0.1
+  title: Breakpoint backend server
+servers:
+  - url: http://localhost:1323/
+    description: OpenAPI endpoint probably
 tags:
   - name: ping1
   - name: ping
@@ -102,12 +105,12 @@ paths:
                       type: string
 
   /{id}:
+    parameters:
+        - $ref: "#/components/parameters/id"
     get:
       tags:
         - user
       operationId: getUserDetail
-      parameters:
-        - $ref: "#/components/parameters/id"
       responses:
         '200':
           description: detail user response
@@ -127,8 +130,16 @@ paths:
       tags:
         - user
       operationId: updateUserDetail
-      parameters:
-        - $ref: "#/components/parameters/id"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+
       responses:
         '200':
           description: detail user response
@@ -137,16 +148,18 @@ paths:
               schema:
                 type: object
                 properties:
-                  status:
+                  username:
+                    type: string
+                  updated_at:
                     type: string
 
   /{id}/preferences:
+    parameters:
+        - $ref: "#/components/parameters/id"
     get:
       tags:
         - user
       operationId: getUserPreferences
-      parameters:
-        - $ref: "#/components/parameters/id"
       responses:
         '200':
           description: detail user response
@@ -162,8 +175,15 @@ paths:
       tags:
         - user
       operationId: updateUserPreferences
-      parameters:
-        - $ref: "#/components/parameters/id"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                preference:
+                  type: string
       responses:
         '200':
           description: detail user response
@@ -172,17 +192,19 @@ paths:
               schema:
                 type: object
                 properties:
-                  status:
+                  preference:
+                    type: string
+                  updated_at:
                     type: string
 
 
   /{id}/techniques:
+    parameters:
+        - $ref: "#/components/parameters/id"
     get:
       tags:
         - breakpoints
       operationId: getBreakPointTechniques
-      parameters:
-        - $ref: "#/components/parameters/id"
       responses:
         '200':
           description: detail user response
@@ -217,12 +239,12 @@ paths:
                     type: string
   
   /{id}/history:
+    parameters:
+        - $ref: "#/components/parameters/id"
     get:
       tags:
         - breakpoints
       operationId: getBreakPointHistory
-      parameters:
-        - $ref: "#/components/parameters/id"
       responses:
         '200':
           description: detail user response

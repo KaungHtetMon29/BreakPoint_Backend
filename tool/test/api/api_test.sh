@@ -27,3 +27,7 @@ curl localhost:1323/plans/1a8cc69e-c7d0-4f27-8e2e-a6023c27cdac/plan_history
 
 echo "------------------------"
 curl localhost:1323/plans/259fe845-4b2d-4558-bd95-efbf1bd92d87/usage
+
+echo "------------------------"
+curl -X PUT localhost:1323/user/1a8cc69e-c7d0-4f27-8e2e-a6023c27cdac -H "Content-Type: application/json" -d '{"username": "something"}'
+curl -X PUT localhost:1323/user/1a8cc69e-c7d0-4f27-8e2e-a6023c27cdac/preferences -H "Content-Type: application/json" -d '{"preference": "{\"theme\": \"dark\", \"notifications\": {\"sms\": true, \"email\": true}}"}'

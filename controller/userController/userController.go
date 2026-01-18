@@ -2,6 +2,7 @@ package userController
 
 import (
 	"net/http"
+	"time"
 
 	"github.com/KaungHtetMon29/BreakPoint_Backend/api_gen/user"
 	"github.com/KaungHtetMon29/BreakPoint_Backend/dto"
@@ -20,7 +21,7 @@ func NewUserCtrler(userUsecase usecase.UserUsecase) *User {
 }
 
 func (pc *User) GetUserDetail(ctx echo.Context, id user.Id) error {
-	user, err := pc.userUsecase.GetUserDetail(id)
+	user, err := pc.userUsecase.GetUserDetail(ctx, id)
 	if err != nil {
 		return err
 	}
@@ -32,11 +33,23 @@ func (pc *User) GetUserDetail(ctx echo.Context, id user.Id) error {
 }
 
 func (pc *User) UpdateUserDetail(ctx echo.Context, id user.Id) error {
-	return ctx.JSON(http.StatusOK, "update user detail")
+	body := new(user.UpdateUserDetailJSONRequestBody)
+	err := ctx.Bind(body)
+	if err != nil {
+		return err
+	}
+	user, err := pc.userUsecase.UpdateUserDetail(ctx, body, id)
+	if err != nil {
+		return err
+	}
+	return ctx.JSON(http.StatusOK, dto.UpdateUserInfoDto{
+		UserName:  user.Username,
+		UpdatedAt: time.Now().String(),
+	})
 }
 
 func (pc *User) GetUserPreferences(ctx echo.Context, id user.Id) error {
-	userPreferences, err := pc.userUsecase.GetUserPreferences(id)
+	userPreferences, err := pc.userUsecase.GetUserPreferences(ctx, id)
 	if err != nil {
 		return err
 	}
@@ -46,5 +59,17 @@ func (pc *User) GetUserPreferences(ctx echo.Context, id user.Id) error {
 }
 
 func (pc *User) UpdateUserPreferences(ctx echo.Context, id user.Id) error {
-	return ctx.JSON(http.StatusOK, "update user preference")
+	body := new(user.UpdateUserPreferencesJSONBody)
+	err := ctx.Bind(body)
+	if err != nil {
+		return err
+	}
+	userPreferences, err := pc.userUsecase.UpdateUserPreferences(ctx, body, id)
+	if err != nil {
+		return err
+	}
+	return ctx.JSON(http.StatusOK, dto.UpdateUserPreferences{
+		Preference: userPreferences.Preferences.String(),
+		UpdatedAt:  time.Now().String(),
+	})
 }

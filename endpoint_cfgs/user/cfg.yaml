@@ -1,6 +1,7 @@
 package: user
 output: api_gen/user/user.gen.go
 generate:
+  server-urls: true
   models: true
   echo-server: true
 output-options:

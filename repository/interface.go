@@ -11,6 +11,8 @@ import (
 type UserRepository interface {
 	GetUserDetailWithId(id user.Id) (*schema.User, error)
 	GetUserPreferences(id user.Id) (*schema.UserPreferences, error)
+	UpdateUserDetail(ctx echo.Context, username string, id user.Id) (*schema.User, error)
+	UpdateUserPreferences(ctx echo.Context, body *user.UpdateUserPreferencesJSONBody, id user.Id) (*schema.UserPreferences, error)
 }
 
 type BreakpointRepository interface {

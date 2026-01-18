@@ -11,8 +11,27 @@ import (
 	"github.com/oapi-codegen/runtime"
 )
 
+// ServerUrlOpenAPIEndpointProbably defines the Server URL for OpenAPI endpoint probably
+const ServerUrlOpenAPIEndpointProbably = "http://localhost:1323/"
+
 // Id defines model for id.
 type Id = string
+
+// UpdateUserDetailJSONBody defines parameters for UpdateUserDetail.
+type UpdateUserDetailJSONBody struct {
+	Username *string `json:"username,omitempty"`
+}
+
+// UpdateUserPreferencesJSONBody defines parameters for UpdateUserPreferences.
+type UpdateUserPreferencesJSONBody struct {
+	Preference *string `json:"preference,omitempty"`
+}
+
+// UpdateUserDetailJSONRequestBody defines body for UpdateUserDetail for application/json ContentType.
+type UpdateUserDetailJSONRequestBody UpdateUserDetailJSONBody
+
+// UpdateUserPreferencesJSONRequestBody defines body for UpdateUserPreferences for application/json ContentType.
+type UpdateUserPreferencesJSONRequestBody UpdateUserPreferencesJSONBody
 
 // ServerInterface represents all server handlers.
 type ServerInterface interface {

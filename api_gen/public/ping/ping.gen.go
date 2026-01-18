@@ -12,6 +12,9 @@ type Pong struct {
 	Ping string `json:"ping"`
 }
 
+// Id defines model for id.
+type Id = string
+
 // ServerInterface represents all server handlers.
 type ServerInterface interface {
 

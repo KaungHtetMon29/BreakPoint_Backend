@@ -9,8 +9,10 @@ import (
 )
 
 type UserUsecase interface {
-	GetUserDetail(id user.Id) (*schema.User, error)
-	GetUserPreferences(id user.Id) (*schema.UserPreferences, error)
+	GetUserDetail(ctx echo.Context, id user.Id) (*schema.User, error)
+	GetUserPreferences(ctx echo.Context, id user.Id) (*schema.UserPreferences, error)
+	UpdateUserDetail(ctx echo.Context, body *user.UpdateUserDetailJSONRequestBody, id user.Id) (*schema.User, error)
+	UpdateUserPreferences(ctx echo.Context, body *user.UpdateUserPreferencesJSONBody, id user.Id) (*schema.UserPreferences, error)
 }
 
 type BreakpointUsecase interface {

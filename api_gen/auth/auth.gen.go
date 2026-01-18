@@ -7,6 +7,9 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
+// Id defines model for id.
+type Id = string
+
 // ServerInterface represents all server handlers.
 type ServerInterface interface {
 
