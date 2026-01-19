@@ -1,6 +1,9 @@
 package main
 
 import (
+	"context"
+	"log"
+	"os"
 	"time"
 
 	"github.com/KaungHtetMon29/BreakPoint_Backend/api_gen/admin"
@@ -24,13 +27,32 @@ import (
 	"github.com/KaungHtetMon29/BreakPoint_Backend/usecase/breakpointUsecase"
 	plansUsecase "github.com/KaungHtetMon29/BreakPoint_Backend/usecase/plans"
 	"github.com/KaungHtetMon29/BreakPoint_Backend/usecase/userUsecase"
+	"github.com/joho/godotenv"
 	"github.com/labstack/echo/v4"
+	"github.com/openai/openai-go/v3"
+	"github.com/openai/openai-go/v3/option"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
 
 func main() {
-
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatal("Error loading .env file")
+	}
+	client := openai.NewClient(
+		option.WithAPIKey(os.Getenv("OPENAI_KEY")),
+	)
+	chatCompletion, err := client.Chat.Completions.New(context.TODO(), openai.ChatCompletionNewParams{
+		Messages: []openai.ChatCompletionMessageParamUnion{
+			openai.UserMessage("Say this is a test"),
+		},
+		Model: openai.ChatModelGPT4o,
+	})
+	if err != nil {
+		panic(err.Error())
+	}
+	println(chatCompletion.Choices[0].Message.Content)
 	e := echo.New()
 	dsn := "host=localhost user=test password=testkhm dbname=testdb port=5432 sslmode=disable TimeZone=Asia/Shanghai"
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
