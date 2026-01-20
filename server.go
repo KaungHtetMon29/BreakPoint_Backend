@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"log"
 	"os"
 	"time"
@@ -27,6 +28,7 @@ import (
 	"github.com/KaungHtetMon29/BreakPoint_Backend/usecase/breakpointUsecase"
 	plansUsecase "github.com/KaungHtetMon29/BreakPoint_Backend/usecase/plans"
 	"github.com/KaungHtetMon29/BreakPoint_Backend/usecase/userUsecase"
+	"github.com/invopop/jsonschema"
 	"github.com/joho/godotenv"
 	"github.com/labstack/echo/v4"
 	"github.com/openai/openai-go/v3"
@@ -35,7 +37,36 @@ import (
 	"gorm.io/gorm"
 )
 
+type TestSchema struct {
+	WorkDuration  int `json:"work_duration" jsonschema:"title=work_duration,example=3600" jsonschema_description:"the working duration in seconds"`
+	BreakDuration int `json:"break_duration" jsonschema:"title=break_duration, example=300" jsonschema_description:"the break duration in seconds"`
+}
+
+type TestSchemaArr struct {
+	BreakTechniques []TestSchema `json:"break_techniques" jsonschema:"title=break_techniques,type=array"`
+}
+
+func GenerateSchema[T any]() interface{} {
+	// Structured Outputs uses a subset of JSON schema
+	// These flags are necessary to comply with the subset
+	reflector := jsonschema.Reflector{
+		AllowAdditionalProperties: false,
+		DoNotReference:            true,
+	}
+	var v T
+	schema := reflector.Reflect(v)
+	return schema
+}
+
+var TestResSchema = GenerateSchema[TestSchemaArr]()
+
 func main() {
+	schemaParam := openai.ResponseFormatJSONSchemaJSONSchemaParam{
+		Name:        "work_and_break_time_suggestion",
+		Description: openai.String("Work and break time suggestion"),
+		Schema:      TestResSchema,
+		Strict:      openai.Bool(true),
+	}
 	err := godotenv.Load()
 	if err != nil {
 		log.Fatal("Error loading .env file")
@@ -43,16 +74,57 @@ func main() {
 	client := openai.NewClient(
 		option.WithAPIKey(os.Getenv("OPENAI_KEY")),
 	)
-	chatCompletion, err := client.Chat.Completions.New(context.TODO(), openai.ChatCompletionNewParams{
+	_, err = client.Chat.Completions.New(context.TODO(), openai.ChatCompletionNewParams{
 		Messages: []openai.ChatCompletionMessageParamUnion{
-			openai.UserMessage("Say this is a test"),
+			openai.AssistantMessage(`
+				userid = 1234
+				data = didn't took a break of 5 mins at 11:00
+				date = 21/1/2026
+			`),
 		},
-		Model: openai.ChatModelGPT4o,
+		Model: openai.ChatModelGPT5Mini,
+		N:     openai.Int(1),
 	})
 	if err != nil {
 		panic(err.Error())
 	}
-	println(chatCompletion.Choices[0].Message.Content)
+
+	chatCompletion, err := client.Chat.Completions.New(context.TODO(), openai.ChatCompletionNewParams{
+		ResponseFormat: openai.ChatCompletionNewParamsResponseFormatUnion{
+			OfJSONSchema: &openai.ResponseFormatJSONSchemaParam{
+				JSONSchema: schemaParam,
+			},
+		},
+		Messages: []openai.ChatCompletionMessageParamUnion{
+			openai.AssistantMessage(`
+				userid = 1234
+				age = 24
+				job = software engineer
+				work hours = 8 hours
+				work time = 7:30 am - 4:30 pm
+				lunch break = 1 hour
+				heal condition = "all good. only eye strain. I have headache. Also, have back pain"
+				request = "suggest me duration to work continuously and duration to take a break.
+				I have adhd.
+				based on some health analysis and various break techniques and make your own break techniques based on your data and research.
+				I want to be more productive and less stress from work"
+				break_techniques = 3 techniques
+			`),
+		},
+		Model: openai.ChatModelGPT5Mini,
+		N:     openai.Int(1),
+	})
+	if err != nil {
+		panic(err.Error())
+	}
+	var catorigin TestSchemaArr
+	_ = json.Unmarshal([]byte(chatCompletion.Choices[0].Message.Content), &catorigin)
+	println(catorigin.BreakTechniques[0].WorkDuration)
+	println(catorigin.BreakTechniques[0].BreakDuration)
+	println(catorigin.BreakTechniques[1].WorkDuration)
+	println(catorigin.BreakTechniques[1].BreakDuration)
+	println(catorigin.BreakTechniques[2].WorkDuration)
+	println(catorigin.BreakTechniques[2].BreakDuration)
 	e := echo.New()
 	dsn := "host=localhost user=test password=testkhm dbname=testdb port=5432 sslmode=disable TimeZone=Asia/Shanghai"
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
