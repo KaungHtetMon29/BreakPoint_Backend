@@ -21,6 +21,7 @@ func NewBreakpointsCtrler(breakpointUsecase usecase.BreakpointUsecase) *Breakpoi
 }
 
 func (bpc *Breakpoints) GenerateBreakPoint(ctx echo.Context) error {
+	bpc.breakpointUsecase.GenerateBreakPoint(ctx)
 	return ctx.JSON(http.StatusOK, "Generate Breakpoint")
 }
 

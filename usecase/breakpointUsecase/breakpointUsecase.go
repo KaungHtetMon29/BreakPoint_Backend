@@ -18,6 +18,7 @@ func NewBreakpointUsecase(breakpointRepo repository.BreakpointRepository) *Break
 }
 
 func (bp *BreakpointUsecase) GenerateBreakPoint(ctx echo.Context) error {
+	bp.breakpointRepo.GenerateBreakPoint(ctx)
 	return nil
 }
 

@@ -3,20 +3,26 @@ package breakpointRepository
 import (
 	"github.com/KaungHtetMon29/BreakPoint_Backend/api_gen/breakpoints"
 	"github.com/KaungHtetMon29/BreakPoint_Backend/db/schema"
+	"github.com/KaungHtetMon29/BreakPoint_Backend/internal/ai"
 	"github.com/labstack/echo/v4"
+	"github.com/openai/openai-go/v3"
 	"gorm.io/gorm"
 )
 
 type breakpointRepository struct {
-	db *gorm.DB
+	db     *gorm.DB
+	client *openai.Client
 }
 
-func NewBreakpointRepository(db *gorm.DB) *breakpointRepository {
+func NewBreakpointRepository(db *gorm.DB, client *openai.Client) *breakpointRepository {
 	return &breakpointRepository{
-		db: db,
+		db:     db,
+		client: client,
 	}
 }
+
 func (br *breakpointRepository) GenerateBreakPoint(ctx echo.Context) error {
+	ai.Request(*br.client)
 	return nil
 }
 

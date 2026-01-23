@@ -16,6 +16,7 @@ type UserRepository interface {
 }
 
 type BreakpointRepository interface {
+	GenerateBreakPoint(ctx echo.Context) error
 	GetBreakPointTechniques(ctx echo.Context, id breakpoints.Id) ([]schema.BreakPointTechniques, error)
 	GetBreakPointHistory(ctx echo.Context, id breakpoints.Id) ([]schema.BreakPointGenerateHistory, error)
 }
