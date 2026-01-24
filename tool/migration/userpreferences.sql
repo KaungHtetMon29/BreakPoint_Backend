@@ -1,2 +1,2 @@
 INSERT INTO user_preferences ("user_uuid","created_at","preferences") values 
-('1a8cc69e-c7d0-4f27-8e2e-a6023c27cdac',CURRENT_TIMESTAMP, '{"theme": "dark", "notifications": {"email": true, "sms": false}}'::jsonb)
+('f36a3cd6-4079-4a92-8a86-e76e353b66c3',CURRENT_TIMESTAMP, '{"theme": "dark", "notifications": {"email": true, "sms": false}}'::jsonb)
