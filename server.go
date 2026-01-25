@@ -115,7 +115,7 @@ func main() {
 		&schema.PlanUsage{},
 	)
 	if err != nil {
-		panic("automigration failed")
+		panic(err)
 	}
 	psql, err := db.DB()
 	if err != nil {
