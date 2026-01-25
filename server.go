@@ -1,11 +1,7 @@
 package main
 
 import (
-	"context"
-	"fmt"
-	"io"
 	"log"
-	"net/http"
 	"os"
 	"time"
 
@@ -34,8 +30,6 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/openai/openai-go/v3"
 	"github.com/openai/openai-go/v3/option"
-	"golang.org/x/oauth2"
-	"golang.org/x/oauth2/google"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
@@ -49,7 +43,6 @@ func main() {
 	client := openai.NewClient(
 		option.WithAPIKey(os.Getenv("OPENAI_KEY")),
 	)
-
 	e := echo.New()
 	dsn := "host=localhost user=test password=testkhm dbname=testdb port=5432 sslmode=disable TimeZone=Asia/Shanghai"
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
@@ -57,42 +50,29 @@ func main() {
 		panic("failed to connect database")
 	}
 
-	conf := &oauth2.Config{
-		RedirectURL:  "http://localhost:1323/auth/callback",
-		ClientID:     os.Getenv("GOOGLE_CLIENT_ID"),
-		ClientSecret: os.Getenv("GOOGLE_CLIENT_SECRET"),
-		Endpoint:     google.Endpoint,
-		Scopes:       []string{"https://www.googleapis.com/auth/userinfo.profile"},
-	}
-	url := conf.AuthCodeURL("state")
-	fmt.Printf("visit the url for the auth dialog: %v", url)
-	e.POST("/login", func(c echo.Context) error {
-		fmt.Println("Login")
-		err := c.Redirect(http.StatusPermanentRedirect, url)
-		if err != nil {
-			return err
-		}
-		return err
-	})
-	e.GET("/auth/callback", func(c echo.Context) error {
-		code := c.Request().FormValue("code")
-		fmt.Println(c.Request().FormValue("code"))
-		tok, errt := conf.Exchange(context.TODO(), code)
-		if errt != nil {
-			log.Fatal(errt)
-		}
-		res, err := http.Get(fmt.Sprintf("https://www.googleapis.com/oauth2/v2/userinfo?access_token=%s", tok.AccessToken))
-		if err != nil {
-			return err
-		}
-		defer res.Body.Close()
-		body, err := io.ReadAll(res.Body)
-		if err != nil {
-			return err
-		}
-		fmt.Println(string(body))
-		return nil
-	})
+	// oauth test
+	// scopes := strings.Split(os.Getenv("SCOPES"), ",")
+	// oauth := oauth.NewOauth(
+	// 	os.Getenv("OAUTH_REDIRECT_URL"),
+	// 	os.Getenv("GOOGLE_CLIENT_ID"),
+	// 	os.Getenv("GOOGLE_CLIENT_SECRET"),
+	// 	scopes,
+	// )
+	// fmt.Printf("visit the url for the auth dialog: %v", oauth.AuthCodeUrl)
+	// e.POST("/login", func(c echo.Context) error {
+	// 	fmt.Println("Login")
+	// 	err := c.Redirect(http.StatusPermanentRedirect, oauth.AuthCodeUrl)
+	// 	if err != nil {
+	// 		return err
+	// 	}
+	// 	return err
+	// })
+	// e.GET("/auth/callback", func(c echo.Context) error {
+	// 	code := c.Request().FormValue("code")
+	// 	fmt.Println(c.Request().FormValue("code"))
+	// 	oauth.GetGoogleUserInfo(code)
+	// 	return nil
+	// })
 	err = db.AutoMigrate(
 		&schema.Admin{},
 		&schema.User{},
