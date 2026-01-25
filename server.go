@@ -1,8 +1,11 @@
 package main
 
 import (
+	"fmt"
 	"log"
+	"net/http"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/KaungHtetMon29/BreakPoint_Backend/api_gen/admin"
@@ -20,6 +23,7 @@ import (
 	"github.com/KaungHtetMon29/BreakPoint_Backend/controller/plansController"
 	"github.com/KaungHtetMon29/BreakPoint_Backend/controller/userController"
 	"github.com/KaungHtetMon29/BreakPoint_Backend/db/schema"
+	authentication "github.com/KaungHtetMon29/BreakPoint_Backend/internal/auth"
 	"github.com/KaungHtetMon29/BreakPoint_Backend/repository/breakpointRepository"
 	"github.com/KaungHtetMon29/BreakPoint_Backend/repository/plansRepository"
 	"github.com/KaungHtetMon29/BreakPoint_Backend/repository/userRepository"
@@ -28,6 +32,7 @@ import (
 	"github.com/KaungHtetMon29/BreakPoint_Backend/usecase/userUsecase"
 	"github.com/joho/godotenv"
 	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
 	"github.com/openai/openai-go/v3"
 	"github.com/openai/openai-go/v3/option"
 	"gorm.io/driver/postgres"
@@ -44,6 +49,20 @@ func main() {
 		option.WithAPIKey(os.Getenv("OPENAI_KEY")),
 	)
 	e := echo.New()
+	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
+		AllowOrigins:     []string{"http://localhost:3000"}, // Include the full URL
+		AllowMethods:     []string{echo.GET, echo.POST, echo.PUT, echo.DELETE},
+		AllowHeaders:     []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept, echo.HeaderAuthorization}, // Add necessary headers
+		AllowCredentials: true,
+	}))
+	e.Use(func(next echo.HandlerFunc) echo.HandlerFunc {
+		return func(c echo.Context) error {
+			if c.Request().Method == http.MethodOptions {
+				return c.NoContent(http.StatusOK)
+			}
+			return next(c)
+		}
+	})
 	dsn := "host=localhost user=test password=testkhm dbname=testdb port=5432 sslmode=disable TimeZone=Asia/Shanghai"
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
@@ -51,28 +70,41 @@ func main() {
 	}
 
 	// oauth test
-	// scopes := strings.Split(os.Getenv("SCOPES"), ",")
-	// oauth := oauth.NewOauth(
-	// 	os.Getenv("OAUTH_REDIRECT_URL"),
-	// 	os.Getenv("GOOGLE_CLIENT_ID"),
-	// 	os.Getenv("GOOGLE_CLIENT_SECRET"),
-	// 	scopes,
-	// )
-	// fmt.Printf("visit the url for the auth dialog: %v", oauth.AuthCodeUrl)
-	// e.POST("/login", func(c echo.Context) error {
-	// 	fmt.Println("Login")
-	// 	err := c.Redirect(http.StatusPermanentRedirect, oauth.AuthCodeUrl)
-	// 	if err != nil {
-	// 		return err
-	// 	}
-	// 	return err
-	// })
-	// e.GET("/auth/callback", func(c echo.Context) error {
-	// 	code := c.Request().FormValue("code")
-	// 	fmt.Println(c.Request().FormValue("code"))
-	// 	oauth.GetGoogleUserInfo(code)
-	// 	return nil
-	// })
+	scopes := strings.Split(os.Getenv("SCOPES"), ",")
+	oauth := authentication.NewOauth(
+		os.Getenv("OAUTH_REDIRECT_URL"),
+		os.Getenv("GOOGLE_CLIENT_ID"),
+		os.Getenv("GOOGLE_CLIENT_SECRET"),
+		scopes,
+	)
+
+	fmt.Printf("visit the url for the auth dialog: %v", oauth.AuthCodeUrl)
+	e.POST("/login", func(c echo.Context) error {
+		return c.JSON(http.StatusOK, map[string]string{
+			"redirect_url": oauth.AuthCodeUrl,
+		})
+	})
+	e.GET("/auth/callback", func(c echo.Context) error {
+		code := c.Request().FormValue("code")
+		fmt.Println(c.Request().FormValue("code"))
+		userInfo, err := oauth.GetGoogleUserInfo(code)
+		if err != nil {
+			return err
+		}
+		token, err := authentication.CreateJWTToken(userInfo)
+		if err != nil {
+			return err
+		}
+		cookie := new(http.Cookie)
+		cookie.Name = "test"
+		cookie.Value = *token
+		cookie.Path = "/"
+		cookie.HttpOnly = true
+		cookie.Secure = false
+		c.SetCookie(cookie)
+		return c.Redirect(http.StatusPermanentRedirect, "http://localhost:3000")
+	})
+
 	err = db.AutoMigrate(
 		&schema.Admin{},
 		&schema.User{},
@@ -92,6 +124,7 @@ func main() {
 	psql.SetMaxIdleConns(10)
 	psql.SetMaxOpenConns(100)
 	psql.SetConnMaxLifetime(30 * time.Minute)
+
 	adminGroup := e.Group("/admin")
 	userGroup := e.Group("/user")
 	authGroup := e.Group("/auth")
