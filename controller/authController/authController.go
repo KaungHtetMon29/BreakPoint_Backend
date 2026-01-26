@@ -1,30 +1,61 @@
 package authController
 
 import (
+	"fmt"
 	"net/http"
+
+	authentication "github.com/KaungHtetMon29/BreakPoint_Backend/internal/auth"
 
 	"github.com/labstack/echo/v4"
 )
 
-type User struct {
+type Auth struct {
+	auth *authentication.Oauth
 }
 
-func NewAuthCtrler() *User {
-	return &User{}
+func NewAuthCtrler(auth *authentication.Oauth) *Auth {
+	return &Auth{
+		auth: auth,
+	}
 }
 
-func (pc *User) Login(ctx echo.Context) error {
-	return ctx.JSON(http.StatusOK, "login")
+func (pc *Auth) Login(ctx echo.Context) error {
+	return ctx.JSON(http.StatusOK, map[string]string{
+		"redirect_url": pc.auth.AuthCodeUrl,
+	})
 }
 
-func (pc *User) Logout(ctx echo.Context) error {
+func (pc *Auth) Callback(ctx echo.Context) error {
+	code := ctx.Request().FormValue("code")
+	fmt.Println(ctx.Request().FormValue("code"))
+	userInfo, err := pc.auth.GetGoogleUserInfo(code)
+	if err != nil {
+		return err
+	}
+	token, err := authentication.CreateJWTToken(userInfo)
+	if err != nil {
+		return err
+	}
+	fmt.Println(*token)
+	cookie := http.Cookie{
+		Name:     "test",
+		Value:    *token,
+		Path:     "/",
+		HttpOnly: true,
+		Secure:   false,
+	}
+	ctx.SetCookie(&cookie)
+	return ctx.Redirect(http.StatusPermanentRedirect, "http://localhost:3000")
+}
+
+func (pc *Auth) Logout(ctx echo.Context) error {
 	return ctx.JSON(http.StatusOK, "logout")
 }
 
-func (pc *User) SignUp(ctx echo.Context) error {
+func (pc *Auth) SignUp(ctx echo.Context) error {
 	return ctx.JSON(http.StatusOK, "signup")
 }
 
-func (pc *User) GetProfile(ctx echo.Context) error {
+func (pc *Auth) GetProfile(ctx echo.Context) error {
 	return ctx.JSON(http.StatusOK, "get profile")
 }

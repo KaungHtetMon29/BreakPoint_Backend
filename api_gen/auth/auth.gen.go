@@ -13,6 +13,9 @@ type Id = string
 // ServerInterface represents all server handlers.
 type ServerInterface interface {
 
+	// (GET /callback)
+	Callback(ctx echo.Context) error
+
 	// (POST /login)
 	Login(ctx echo.Context) error
 
@@ -29,6 +32,15 @@ type ServerInterface interface {
 // ServerInterfaceWrapper converts echo contexts to parameters.
 type ServerInterfaceWrapper struct {
 	Handler ServerInterface
+}
+
+// Callback converts echo context to params.
+func (w *ServerInterfaceWrapper) Callback(ctx echo.Context) error {
+	var err error
+
+	// Invoke the callback with all the unmarshaled arguments
+	err = w.Handler.Callback(ctx)
+	return err
 }
 
 // Login converts echo context to params.
@@ -95,6 +107,7 @@ func RegisterHandlersWithBaseURL(router EchoRouter, si ServerInterface, baseURL 
 		Handler: si,
 	}
 
+	router.GET(baseURL+"/callback", wrapper.Callback)
 	router.POST(baseURL+"/login", wrapper.Login)
 	router.POST(baseURL+"/logout", wrapper.Logout)
 	router.GET(baseURL+"/me", wrapper.GetProfile)

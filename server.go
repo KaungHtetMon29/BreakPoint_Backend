@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"log"
-	"net/http"
 	"os"
 	"strings"
 	"time"
@@ -31,6 +30,7 @@ import (
 	plansUsecase "github.com/KaungHtetMon29/BreakPoint_Backend/usecase/plans"
 	"github.com/KaungHtetMon29/BreakPoint_Backend/usecase/userUsecase"
 	"github.com/joho/godotenv"
+	echojwt "github.com/labstack/echo-jwt/v4"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/openai/openai-go/v3"
@@ -55,14 +55,6 @@ func main() {
 		AllowHeaders:     []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept, echo.HeaderAuthorization}, // Add necessary headers
 		AllowCredentials: true,
 	}))
-	e.Use(func(next echo.HandlerFunc) echo.HandlerFunc {
-		return func(c echo.Context) error {
-			if c.Request().Method == http.MethodOptions {
-				return c.NoContent(http.StatusOK)
-			}
-			return next(c)
-		}
-	})
 	dsn := "host=localhost user=test password=testkhm dbname=testdb port=5432 sslmode=disable TimeZone=Asia/Shanghai"
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
@@ -79,31 +71,6 @@ func main() {
 	)
 
 	fmt.Printf("visit the url for the auth dialog: %v", oauth.AuthCodeUrl)
-	e.POST("/login", func(c echo.Context) error {
-		return c.JSON(http.StatusOK, map[string]string{
-			"redirect_url": oauth.AuthCodeUrl,
-		})
-	})
-	e.GET("/auth/callback", func(c echo.Context) error {
-		code := c.Request().FormValue("code")
-		fmt.Println(c.Request().FormValue("code"))
-		userInfo, err := oauth.GetGoogleUserInfo(code)
-		if err != nil {
-			return err
-		}
-		token, err := authentication.CreateJWTToken(userInfo)
-		if err != nil {
-			return err
-		}
-		cookie := new(http.Cookie)
-		cookie.Name = "test"
-		cookie.Value = *token
-		cookie.Path = "/"
-		cookie.HttpOnly = true
-		cookie.Secure = false
-		c.SetCookie(cookie)
-		return c.Redirect(http.StatusPermanentRedirect, "http://localhost:3000")
-	})
 
 	err = db.AutoMigrate(
 		&schema.Admin{},
@@ -130,6 +97,13 @@ func main() {
 	authGroup := e.Group("/auth")
 	breakPointGroup := e.Group("/breakpoints")
 	planGroup := e.Group("/plans")
+	userGroup.Use(echojwt.WithConfig(echojwt.Config{
+		SuccessHandler: func(c echo.Context) {
+			fmt.Println(c.Request().URL)
+		},
+		SigningKey:    []byte(os.Getenv("JWT_TOKEN_SECRET")),
+		SigningMethod: "HS512",
+	}))
 
 	userRepo := userRepository.NewUserRepository(db)
 	breakpointRepo := breakpointRepository.NewBreakpointRepository(db, &client)
@@ -142,7 +116,7 @@ func main() {
 	p1Ctrler := p1controller.NewPing1Ctrler()
 	pCtrler := pcontroller.NewPingCtrler()
 	userCtrl := userController.NewUserCtrler(userUsecase)
-	authCtrl := authController.NewAuthCtrler()
+	authCtrl := authController.NewAuthCtrler(oauth)
 	bpCtrl := breakpointsController.NewBreakpointsCtrler(breakpointUsecase)
 	planCtrl := plansController.NewPlansCtrler(plansUsecase)
 	adminCtrl := adminController.NewAdminCtrler()

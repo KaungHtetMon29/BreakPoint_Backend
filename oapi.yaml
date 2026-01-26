@@ -80,6 +80,15 @@ paths:
         responses:
           '200':
             description: detail signup response
+
+  /callback:
+    get:
+        tags:
+          - auth
+        operationId: callback
+        responses:
+          '200':
+            description: detail signup response
             content:
               application/json:
                 schema:
