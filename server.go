@@ -97,13 +97,15 @@ func main() {
 	authGroup := e.Group("/auth")
 	breakPointGroup := e.Group("/breakpoints")
 	planGroup := e.Group("/plans")
-	userGroup.Use(echojwt.WithConfig(echojwt.Config{
+	authMiddleware := echojwt.WithConfig(echojwt.Config{
 		SuccessHandler: func(c echo.Context) {
 			fmt.Println(c.Request().URL)
 		},
 		SigningKey:    []byte(os.Getenv("JWT_TOKEN_SECRET")),
 		SigningMethod: "HS512",
-	}))
+	})
+	userGroup.Use(authMiddleware)
+	breakPointGroup.Use(authMiddleware)
 
 	userRepo := userRepository.NewUserRepository(db)
 	breakpointRepo := breakpointRepository.NewBreakpointRepository(db, &client)
